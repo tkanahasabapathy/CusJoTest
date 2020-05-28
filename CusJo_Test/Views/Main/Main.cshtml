@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Main Page</title>
+</head>
+<body>
+    <table width="80%" align="center" border="0">
+        <tr>
+            <td align="center">
+                Welcome @Session["CurrentUserName"]!
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <h3>Menu</h3>
+            </td>
+        </tr>
+        @if ((string)Session["CurrentUserType"] == "A")
+        {
+            <tr>
+                <td align="center">
+                    <a href="/Assign/Assign">Assign User Privilege</a>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td align="center">
+                <div id="divMenu"></div>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <br />
+                <a href="/Login/Login">Logoff</a>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        DisplayMenu();
+    });
+
+    function DisplayMenu() {
+        $.ajax({
+            url: "/api/User/GetUserMenus",
+            type: 'GET',
+            contentType:
+                "application/json;charset=utf-8",
+            success: function (menus) {
+                if (menus != null) {
+                    var strMenus = '';
+                    for (i = 0; i < menus.length; i++) {
+                        strMenus += '<a href="' + menus[i].URL + '">' + menus[i].MenuName + '</a></br>';
+                    }
+                    var divLink = document.getElementById('divMenu');
+                    divLink.innerHTML = strMenus;
+                }
+            },
+            error: function () {
+                alert('Issue in Display Menu');
+            }
+        });
+    }
+
+</script>
+

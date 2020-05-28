@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+</head>
+<body>
+    <table width="80%" align="center" border="0">
+        <tr>
+            <td colspan="2" align="center">
+                <h3>Login</h3>
+            </td>
+        </tr>
+        <tr>
+            <td width="50%">
+                <p>
+                    <table width="100%" align="center" border="0">
+                        <tr>
+                            <td colspan="3" align="center">
+                                <b>Register User</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">User Name</td>
+                            <td align="center"> : </td>
+                            <td><input type="text" id="txtUserName" style="width:300px;" /></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Email</td>
+                            <td align="center"> : </td>
+                            <td><input type="text" id="txtEmail" style="width:300px;" /></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Mobile</td>
+                            <td align="center"> : </td>
+                            <td><input type="text" id="txtMobile" style="width:300px;" /></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Password</td>
+                            <td align="center"> : </td>
+                            <td><input type="password" id="txtPassword" style="width:150px;" /></td>
+                        </tr>
+                        <tr>
+                            <td align="right">User Type</td>
+                            <td align="center"> : </td> 
+                            <td>
+                                <input type="radio" id="txtUserType_A" name="txtUserType" value="A" checked />Admin
+                                <input type="radio" id="txtUserType_B" name="txtUserType" value="U" />User
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="center">
+                                <input id="btnRegister" type="button" value="Register"/>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+            </td>
+            <td>
+                <p>
+                    <table width="100%" align="center" border="0">
+                        <tr>
+                            <td colspan="3" align="center">
+                                <b>User Login</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">Email</td>
+                            <td align="center"> : </td>
+                            <td><input type="text" id="txtLoginEmail" style="width:300px;" /></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Password</td>
+                            <td align="center"> : </td>
+                            <td><input type="password" id="txtLoginPassword" style="width:150px;" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="center">
+                                <input id="btnLogin" type="button" value="Login"/>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //alert("ok");
+    });
+
+    $("#btnLogin").click(function () {
+        if (ValidateLogin()) {
+            Login();
+        }
+    });
+
+    $("#btnRegister").click(function () {
+        if (ValidateRegister()) {
+            AddUser();
+        }
+    });
+
+    function ValidateLogin() {
+        if (($("#txtLoginEmail").val() == '') || ($("#txtLoginPassword").val() == '')) {
+            alert("Enter Login Details");
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    function ValidateRegister() {
+        if (($("#txtUserName").val() == '') || ($("#txtEmail").val() == '') || ($("#txtMobile").val() == '') || ($("#txtPassword").val() == '')) {
+            alert("Enter Register Details");
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    function Login() {
+        var credentials = {
+            "Email": $("#txtLoginEmail").val(),
+            "Password": $("#txtLoginPassword").val()
+        }
+
+        $.ajax({
+            url: "/api/User/Login",
+            type: 'POST',
+            contentType:
+                "application/json;charset=utf-8",
+            data: JSON.stringify(credentials),
+            success: function (response) {
+                if (response.Status == 'Success') {
+                    alert(response.Message);
+                    window.location.href = '/Main/Main';
+                }
+                else {
+                    alert(response.Message);
+                }
+            },
+            error: function () {
+                alert('Issue in login');
+            }
+        });
+    }
+
+    function AddUser() {
+        var user = {
+                "UserName": $("#txtUserName").val(),
+                "Email": $("#txtEmail").val(),
+                "Mobile": $("#txtMobile").val(),
+                "Password": $("#txtPassword").val(),
+                "UserType": $("input[name='txtUserType']:checked").val()
+        }
+
+        $.ajax({
+            url: "/api/User/AddUser",
+            type: 'POST',
+            contentType:
+                "application/json;charset=utf-8",
+            data: JSON.stringify(user),
+            success: function (response) {
+                if (response.Status == 'Success') {
+                    alert(response.Message);
+                    window.location.href = '/Login/Login';
+                }
+                else {
+                    alert(response.Message);
+                }
+
+            },
+            error: function () {
+                alert('Issue in Register user');
+            }
+        });
+    }
+</script>

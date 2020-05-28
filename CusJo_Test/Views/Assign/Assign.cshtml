@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Assign Privilege</title>
+</head>
+<body>
+    <table width="80%" align="center" border="1">
+        <tr>
+            <td colspan="2" align="center">
+                <h3>Assign Privilege</h3>
+            </td>
+        </tr>
+        <tr>
+            <td width="50%" valign="top">
+                <table width="100%" align="center" border="0">
+                    <tr>
+                        <td colspan="2" align="center">
+                            <b>Select User</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" align="right">User Name : </td>
+                        <td align="left"><select id='lstUsers'></select></td>
+                    </tr>
+                </table>
+            </td>
+            <td width="50%" valign="top">
+                <table width="100%" align="center" border="0">
+                    <tr>
+                        <td colspan="2" align="center">
+                            <b>Assign Privilege</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" align="right">Page/Menu : </td>
+                        <td align="left"><select id='lstMenus' multiple style="width:100px; height:200px;"></select></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input id="btnSave" type="button" value="Save" />
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        PopulateUsers();
+        PopulateMenus();
+    });
+
+    $("#btnSave").click(function () {
+        SavePrivileges();
+    });
+
+    function PopulateUsers() {
+        $.ajax({
+            url: "/api/User/GetUsers",
+            type: 'GET',
+            contentType:
+                "application/json;charset=utf-8",
+            success: function (users) {
+                if (users != null) {
+                    var mySelect = $('#lstUsers');
+                    for (i = 0; i < users.length; i++) {
+                        mySelect.append('<option value="' + users[i].UserID + '"+>' + users[i].UserName + '</option>');
+                    }
+                }
+            },
+            error: function () {
+                alert('Issue in Populate Users');
+            }
+        });
+    }
+
+    function PopulateMenus() {
+        $.ajax({
+            url: "/api/User/GetMenus",
+            type: 'GET',
+            contentType:
+                "application/json;charset=utf-8",
+            success: function (menus) {
+                if (menus != null) {
+                    var mySelect = $('#lstMenus');
+                    for (i = 0; i < menus.length; i++) {
+                        mySelect.append('<option value="' + menus[i].MenuID + '"+>' + menus[i].MenuName + '</option>');
+                    }
+                }
+            },
+            error: function () {
+                alert('Issue in Populate Menus');
+            }
+        });
+    }
+
+    function SavePrivileges() {
+        var data = {
+            privs: []
+        };
+        $('#lstMenus  > option:selected').each(function () {
+            data.privs.push(
+                {
+                    UserID: $("#lstUsers").val(),
+                    MenuID: $(this).val()
+                }
+            );
+        });
+
+        if (data.privs.length > 0) {
+            $.ajax({
+                url: "/api/User/SavePrivileges",
+                type: 'POST',
+                contentType:
+                    "application/json;charset=utf-8",
+                data: JSON.stringify(data.privs),
+                success: function (response) {
+                    if (response.Status == 'Success') {
+                        alert(response.Message);
+                        window.location.href = '/Main/Main';
+                    }
+                    else {
+                        alert(response.Message);
+                    }
+
+                },
+                error: function () {
+                    alert('Issue in Save Privileges');
+                }
+            });
+        }
+        else {
+            alert("Select Privileges to Assign")
+        }
+
+    }
+</script>
